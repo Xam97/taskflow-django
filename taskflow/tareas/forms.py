@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from .models import Tarea, Comentario
 from proyectos.models import Proyecto
 
+#Widgets de los campos
 class TareaForm(forms.ModelForm):
     class Meta:
         model = Tarea
@@ -46,8 +47,11 @@ class TareaForm(forms.ModelForm):
         }
     
     def __init__(self, *args, **kwargs):
+        #Extraer usuario actual para el control de los permisos
         user = kwargs.pop('user', None)
         self.instance = kwargs.get('instance', None)
+
+        #Llamar al inicializador padre
         super().__init__(*args, **kwargs)
         
         User = get_user_model()

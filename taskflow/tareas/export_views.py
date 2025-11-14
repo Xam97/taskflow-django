@@ -18,6 +18,7 @@ class ExportarTareasCSVView(LoginRequiredMixin, View):
     def get(self, request):
         # Verificar permisos
         if not (request.user.is_superuser or request.user.rol == 'admin'):
+            # Usuario normal: solo ve tareas relacionadas con él
             proyectos_usuario = Proyecto.objects.filter(
                 Q(creador=request.user) | Q(miembros=request.user)
             )
