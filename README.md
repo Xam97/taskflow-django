@@ -2,21 +2,21 @@
 
 Sistema web desarrollado con Django para la gestión de proyectos y tareas en equipo.
 
-## 📋 Características
+##  Características
 
-- ✅ Gestión completa de proyectos y tareas
-- ✅ Sistema de autenticación y autorización
-- ✅ Roles de usuario (Administrador y Miembro)
-- ✅ Dashboard personalizado
-- ✅ CRUD completo de proyectos y tareas
-- ✅ Sistema de comentarios en tareas
-- ✅ Panel de administración personalizado
-- ✅ Interfaz responsive
-- ✅ Búsqueda y filtrado avanzado
-- ✅ Exportación a CSV/PDF
-- ✅ API REST completa
+-  Gestión completa de proyectos y tareas
+-  Sistema de autenticación y autorización
+-  Roles de usuario (Administrador y Miembro)
+-  Dashboard personalizado
+-  CRUD completo de proyectos y tareas
+-  Sistema de comentarios en tareas
+-  Panel de administración personalizado
+-  Interfaz responsive
+-  Búsqueda y filtrado avanzado
+-  Exportación a CSV/PDF
+-  API REST completa
 
-## 🚀 Instalación
+## Instalación
 
 ### Requisitos Previos
 
@@ -142,7 +142,7 @@ ALLOWED_HOSTS=localhost,127.0.0.1
 from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())
 ```
 
-## 🧪 Ejecutar Tests
+##  Ejecutar Tests
 
 ```bash
 python manage.py test
