@@ -2,8 +2,10 @@ from rest_framework import serializers
 from .models import Tarea
 
 class TareaSerializer(serializers.ModelSerializer):
+
+    #campos de solo lectura
     proyecto_nombre = serializers.CharField(source='proyecto.nombre', read_only=True)
-    asignado_username = serializers.CharField(source='asignado_a.username', read_only=True)
+    asignado_username = serializers.CharField(source='asignado_a.username', read_only=True) #solo lectura para la api
     
     class Meta:
         model = Tarea

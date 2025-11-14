@@ -16,6 +16,7 @@ class ListaTareasView(LoginRequiredMixin, ListView):
     paginate_by = 10
     
     def get_queryset(self):
+        #obtener parametros de filtro de la URL
         estado_filter = self.request.GET.get('estado')
         search_query = self.request.GET.get('q', '')
         prioridad_filter = self.request.GET.get('prioridad', '')
@@ -56,6 +57,7 @@ class ListaTareasView(LoginRequiredMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        #Pasar valores actuales de filtros al template
         context['estado_filter'] = self.request.GET.get('estado', '')
         context['prioridad_filter'] = self.request.GET.get('prioridad', '')
         context['search_query'] = self.request.GET.get('q', '')
