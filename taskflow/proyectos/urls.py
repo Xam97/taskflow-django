@@ -2,8 +2,11 @@ from django.urls import path
 from . import views
 from .export_views import ExportarProyectosCSVView, ExportarProyectosPDFView
 
+# Define el nombre de la aplicación para namespacing
+# Permite referenciar URLs como 'proyectos:lista_proyectos'
 app_name = 'proyectos'
 
+# Lista de patrones URL de la aplicación
 urlpatterns = [
     path('', views.ListaProyectosView.as_view(), name='lista_proyectos'),
     path('crear/', views.CrearProyectoView.as_view(), name='crear_proyecto'),
