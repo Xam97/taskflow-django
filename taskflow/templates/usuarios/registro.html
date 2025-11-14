@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Registro - TaskFlow{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="fas fa-user-plus"></i> Crear Cuenta</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Por favor corrige los siguientes errores:</strong>
+                            <ul class="mb-0">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="id_username" class="form-label">
+                                    <strong>Usuario *</strong>
+                                </label>
+                                {{ form.username }}
+                                {% if form.username.help_text %}
+                                    <div class="form-text">{{ form.username.help_text }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="id_email" class="form-label">
+                                    <strong>Email *</strong>
+                                </label>
+                                {{ form.email }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="id_first_name" class="form-label">
+                                    <strong>Nombre *</strong>
+                                </label>
+                                {{ form.first_name }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="id_last_name" class="form-label">
+                                    <strong>Apellido *</strong>
+                                </label>
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="id_password1" class="form-label">
+                                    <strong>Contraseña *</strong>
+                                </label>
+                                {{ form.password1 }}
+                                {% if form.password1.help_text %}
+                                    <div class="form-text">
+                                        <small>
+                                            - Mínimo 8 caracteres<br>
+                                            - No puede ser solo numérica<br>
+                                            - No puede ser muy común
+                                        </small>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="id_password2" class="form-label">
+                                    <strong>Confirmar Contraseña *</strong>
+                                </label>
+                                {{ form.password2 }}
+                                {% if form.password2.help_text %}
+                                    <div class="form-text">{{ form.password2.help_text }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-user-plus"></i> Registrarse
+                        </button>
+                    </div>
+                </form>
+                
+                <hr>
+                
+                <div class="text-center">
+                    <p class="mb-0">¿Ya tienes cuenta? 
+                        <a href="{% url 'login' %}" class="text-decoration-none">Inicia sesión aquí</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block title %}Tareas - TaskFlow{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>
+        <i class="fas fa-tasks"></i> 
+        {% if user.is_superuser or user.rol == 'admin' %}
+            Todas las Tareas
+        {% else %}
+            Mis Tareas
+        {% endif %}
+    </h1>
+    <a href="{% url 'tareas:crear_tarea' %}" class="btn btn-primary" title="Crear nueva tarea">
+        <i class="fas fa-plus"></i> Nueva Tarea
+    </a>
+</div>
+
+<!-- Formulario de Búsqueda y Filtros -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="get" action="{% url 'tareas:lista_tareas' %}" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="search_query_tareas" class="form-label visually-hidden">Buscar tareas</label>
+                        <input type="text" 
+                               id="search_query_tareas"
+                               name="q" 
+                               class="form-control" 
+                               placeholder="Buscar tareas..." 
+                               value="{{ search_query }}"
+                               aria-label="Buscar tareas por título, descripción o proyecto">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="estado_filter_tareas" class="form-label visually-hidden">Filtrar por estado</label>
+                        <select name="estado" 
+                                id="estado_filter_tareas"
+                                class="form-select"
+                                title="Filtrar tareas por estado"
+                                aria-label="Filtrar tareas por estado">
+                            <option value="">Todos los estados</option>
+                            {% for estado_code, estado_name in estados_disponibles %}
+                                <option value="{{ estado_code }}" {% if estado_filter == estado_code %}selected{% endif %}>
+                                    {{ estado_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="prioridad_filter_tareas" class="form-label visually-hidden">Filtrar por prioridad</label>
+                        <select name="prioridad" 
+                                id="prioridad_filter_tareas"
+                                class="form-select"
+                                title="Filtrar tareas por prioridad"
+                                aria-label="Filtrar tareas por prioridad">
+                            <option value="">Todas las prioridades</option>
+                            {% for prioridad_code, prioridad_name in prioridades_disponibles %}
+                                <option value="{{ prioridad_code }}" {% if prioridad_filter == prioridad_code|stringformat:"s" %}selected{% endif %}>
+                                    {{ prioridad_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                        <a href="{% url 'tareas:lista_tareas' %}" class="btn btn-secondary w-100 mt-2">
+                            <i class="fas fa-times"></i> Limpiar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Botones de Exportación -->
+<div class="row mb-3">
+    <div class="col-12 text-end">
+        <a href="{% url 'tareas:exportar_csv' %}" class="btn btn-success">
+            <i class="fas fa-file-csv"></i> Exportar CSV
+        </a>
+        <a href="{% url 'tareas:exportar_pdf' %}" class="btn btn-danger">
+            <i class="fas fa-file-pdf"></i> Exportar PDF
+        </a>
+    </div>
+</div>
+
+{% if tareas %}
+    <div class="row">
+        {% for tarea in tareas %}
+        <div class="col-12 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="card-title">
+                                <a href="{% url 'tareas:detalle_tarea' tarea.pk %}" class="text-decoration-none">
+                                    {{ tarea.titulo }}
+                                </a>
+                                <span class="badge bg-{% if tarea.prioridad == 4 %}danger{% elif tarea.prioridad == 3 %}warning{% elif tarea.prioridad == 2 %}info{% else %}secondary{% endif %}">
+                                    {{ tarea.get_prioridad_display }}
+                                </span>
+                                <span class="badge bg-{% if tarea.estado == 'completada' %}success{% elif tarea.estado == 'en_progreso' %}info{% else %}warning{% endif %}">
+                                    {{ tarea.get_estado_display }}
+                                </span>
+                            </h5>
+                            <p class="card-text text-muted mb-1">
+                                <i class="fas fa-project-diagram"></i> {{ tarea.proyecto.nombre }}
+                            </p>
+                            <p class="card-text small text-muted">
+                                {{ tarea.descripcion|truncatewords:20 }}
+                            </p>
+                            <div class="d-flex gap-3 text-muted small">
+                                <span>
+                                    <i class="fas fa-user"></i> 
+                                    {% if tarea.asignado_a %}
+                                        {{ tarea.asignado_a.first_name|default:tarea.asignado_a.username }}
+                                    {% else %}
+                                        Sin asignar
+                                    {% endif %}
+                                </span>
+                                <span>
+                                    <i class="fas fa-calendar"></i> 
+                                    {% if tarea.fecha_vencimiento %}
+                                        {{ tarea.fecha_vencimiento|date:"d M Y" }}
+                                    {% else %}
+                                        Sin fecha
+                                    {% endif %}
+                                </span>
+                                <span>
+                                    <i class="fas fa-comments"></i> 
+                                    {{ tarea.comentarios.count }} comentarios
+                                </span>
+                            </div>
+                        </div>
+                       <div class="col-md-4 text-end">
+    <div class="btn-group" role="group">
+        <a href="{% url 'tareas:detalle_tarea' tarea.pk %}" 
+           class="btn btn-sm btn-outline-primary" title="Ver tarea">
+            <i class="fas fa-eye"></i>
+        </a>
+        
+        <!-- Editar - solo para admin y creador -->
+        {% if user.is_superuser or user.rol == 'admin' or tarea.creador == user %}
+        <a href="{% url 'tareas:actualizar_tarea' tarea.pk %}" 
+           class="btn btn-sm btn-outline-secondary" title="Editar tarea">
+            <i class="fas fa-edit"></i>
+        </a>
+        {% endif %}
+        
+        <!-- Eliminar - solo para admin y creador -->
+        {% if user.is_superuser or user.rol == 'admin' or tarea.creador == user %}
+        <a href="{% url 'tareas:eliminar_tarea' tarea.pk %}" 
+           class="btn btn-sm btn-outline-danger" title="Eliminar tarea">
+            <i class="fas fa-trash"></i>
+        </a>
+        {% endif %}
+    </div>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Paginación -->
+    {% if is_paginated %}
+    <nav aria-label="Paginación de tareas">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if estado_filter %}&estado={{ estado_filter }}{% endif %}{% if prioridad_filter %}&prioridad={{ prioridad_filter }}{% endif %}" title="Página anterior">
+                        &laquo; Anterior
+                    </a>
+                </li>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if estado_filter %}&estado={{ estado_filter }}{% endif %}{% if prioridad_filter %}&prioridad={{ prioridad_filter }}{% endif %}" title="Página {{ num }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if estado_filter %}&estado={{ estado_filter }}{% endif %}{% if prioridad_filter %}&prioridad={{ prioridad_filter }}{% endif %}" title="Página siguiente">
+                        Siguiente &raquo;
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    
+{% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-tasks fa-4x text-muted mb-3"></i>
+        <h3 class="text-muted">No hay tareas</h3>
+        <p class="text-muted">
+            {% if user.is_superuser or user.rol == 'admin' %}
+                No hay tareas en el sistema.
+            {% else %}
+                No tienes tareas asignadas.
+            {% endif %}
+        </p>
+        <a href="{% url 'tareas:crear_tarea' %}" class="btn btn-primary btn-lg" title="Crear primera tarea">
+            <i class="fas fa-plus"></i> Crear Primera Tarea
+        </a>
+    </div>
+{% endif %}
+{% endblock %}

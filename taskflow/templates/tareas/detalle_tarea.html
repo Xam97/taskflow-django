@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ tarea.titulo }} - TaskFlow{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-1">
+            <i class="fas fa-tasks"></i> {{ tarea.titulo }}
+        </h1>
+        <div>
+            <span class="badge bg-{% if tarea.prioridad == 4 %}danger{% elif tarea.prioridad == 3 %}warning{% elif tarea.prioridad == 2 %}info{% else %}secondary{% endif %}">
+                {{ tarea.get_prioridad_display }}
+            </span>
+            <span class="badge bg-{% if tarea.estado == 'completada' %}success{% elif tarea.estado == 'en_progreso' %}info{% else %}warning{% endif %}">
+                {{ tarea.get_estado_display }}
+            </span>
+        </div>
+    </div>
+    <div>
+        {% if user.is_superuser or user.rol == 'admin' or tarea.creador == user %}
+        <a href="{% url 'tareas:actualizar_tarea' tarea.pk %}" class="btn btn-outline-secondary" title="Editar tarea">
+            <i class="fas fa-edit"></i> Editar
+        </a>
+        {% endif %}
+        <a href="{% url 'tareas:lista_tareas' %}" class="btn btn-outline-primary" title="Volver a la lista de tareas">
+            <i class="fas fa-arrow-left"></i> Volver a Tareas
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Información de la Tarea -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Información de la Tarea</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ tarea.descripcion|linebreaks }}</p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-project-diagram"></i> Proyecto:</strong><br>
+                        <a href="{% url 'proyectos:detalle_proyecto' tarea.proyecto.pk %}">{{ tarea.proyecto.nombre }}</a></p>
+                        
+                        <p><strong><i class="fas fa-user"></i> Asignado a:</strong><br>
+                        {{ tarea.asignado_a.get_full_name|default:tarea.asignado_a.username }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-user-plus"></i> Creador:</strong><br>
+                        {{ tarea.creador.get_full_name|default:tarea.creador.username }}</p>
+                        
+                        <p><strong><i class="fas fa-calendar-plus"></i> Fecha de Creación:</strong><br>
+                        {{ tarea.fecha_creacion|date:"d M Y H:i" }}</p>
+                        
+                        <p><strong><i class="fas fa-calendar-check"></i> Fecha de Vencimiento:</strong><br>
+                        {{ tarea.fecha_vencimiento|date:"d M Y" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Comentarios -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-comments"></i> Comentarios</h5>
+                <a href="{% url 'tareas:crear_comentario' tarea.pk %}" class="btn btn-sm btn-primary" title="Agregar comentario">
+                    <i class="fas fa-plus"></i> Nuevo Comentario
+                </a>
+            </div>
+            <div class="card-body">
+                {% if comentarios %}
+                    {% for comentario in comentarios %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <strong>{{ comentario.autor.get_full_name|default:comentario.autor.username }}</strong>
+                                <small class="text-muted">{{ comentario.fecha_creacion|date:"d M Y H:i" }}</small>
+                            </div>
+                            <p class="card-text mb-0">{{ comentario.contenido|linebreaks }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center py-3">No hay comentarios aún.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Panel Lateral -->
+    <div class="col-lg-4">
+       <!-- Acciones Rápidas -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0"><i class="fas fa-bolt"></i> Acciones Rápidas</h5>
+    </div>
+    <div class="card-body">
+        <div class="d-grid gap-2">
+            <!-- Agregar comentario - disponible para todos los usuarios con acceso -->
+            <a href="{% url 'tareas:crear_comentario' tarea.pk %}" class="btn btn-outline-primary">
+                <i class="fas fa-comment"></i> Agregar Comentario
+            </a>
+            
+            <!-- Editar tarea - solo para admin, creador o asignado con permisos -->
+            {% if user.is_superuser or user.rol == 'admin' or tarea.creador == user %}
+            <a href="{% url 'tareas:actualizar_tarea' tarea.pk %}" class="btn btn-outline-warning">
+                <i class="fas fa-edit"></i> Editar Tarea
+            </a>
+            {% endif %}
+            <!-- Marcar como completada - disponible para admin, creador y asignado -->
+{% if tarea.estado != 'completada' %}
+    {% if user.is_superuser or user.rol == 'admin' or tarea.creador == user or tarea.asignado_a == user %}
+    <form method="post" action="{% url 'tareas:completar_tarea' tarea.pk %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-success w-100">
+            <i class="fas fa-check"></i> Marcar como Completada
+        </button>
+    </form>
+    {% endif %}
+{% endif %}
+        </div>
+    </div>
+</div>
+        
+        <!-- Información del Proyecto -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="mb-0"><i class="fas fa-project-diagram"></i> Proyecto</h5>
+            </div>
+            <div class="card-body">
+                <h6>{{ tarea.proyecto.nombre }}</h6>
+                <p class="small text-muted">{{ tarea.proyecto.descripcion|truncatewords:15 }}</p>
+                <a href="{% url 'proyectos:detalle_proyecto' tarea.proyecto.pk %}" class="btn btn-sm btn-outline-primary w-100">
+                    <i class="fas fa-external-link-alt"></i> Ver Proyecto
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

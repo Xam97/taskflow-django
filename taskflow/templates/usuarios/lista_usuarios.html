@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestión de Usuarios - TaskFlow{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>
+        <i class="fas fa-users"></i> Gestión de Usuarios
+    </h1>
+    <a href="{% url 'crear_administrador' %}" class="btn btn-primary" title="Crear nuevo usuario">
+        <i class="fas fa-user-plus"></i> Nuevo Usuario
+    </a>
+</div>
+
+<!-- Estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card stats-card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                <h4>{{ total_usuarios }}</h4>
+                <p class="card-text">Total Usuarios</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stats-card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <i class="fas fa-user-shield fa-2x text-warning mb-2"></i>
+                <h4>{{ total_admins }}</h4>
+                <p class="card-text">Administradores</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stats-card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <i class="fas fa-user fa-2x text-success mb-2"></i>
+                <h4>{{ total_miembros }}</h4>
+                <p class="card-text">Miembros</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-3">
+                <strong>Filtrar por rol:</strong>
+            </div>
+            <div class="col-md-9">
+                <div class="btn-group" role="group">
+                    <a href="?rol=admin" class="btn btn-{% if request.GET.rol == 'admin' %}warning{% else %}outline-warning{% endif %} btn-sm">
+                        Administradores
+                    </a>
+                    <a href="?rol=miembro" class="btn btn-{% if request.GET.rol == 'miembro' %}success{% else %}outline-success{% endif %} btn-sm">
+                        Miembros
+                    </a>
+                    <a href="{% url 'lista_usuarios' %}" class="btn btn-{% if not request.GET.rol %}secondary{% else %}outline-secondary{% endif %} btn-sm">
+                        Todos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if usuarios %}
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Nombre Completo</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Fecha Registro</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for usuario in usuarios %}
+                        <tr>
+                            <td>
+                                <strong>{{ usuario.username }}</strong>
+                            </td>
+                            <td>{{ usuario.get_full_name }}</td>
+                            <td>{{ usuario.email }}</td>
+                            <td>
+                                <span class="badge bg-{% if usuario.is_superuser %}danger{% elif usuario.rol == 'admin' %}warning{% else %}success{% endif %}">
+                                    {% if usuario.is_superuser %}
+                                        Super Admin
+                                    {% else %}
+                                        {{ usuario.get_rol_display }}
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if usuario.is_active %}success{% else %}secondary{% endif %}">
+                                    {{ usuario.is_active|yesno:"Activo,Inactivo" }}
+                                </span>
+                            </td>
+                            <td>{{ usuario.date_joined|date:"d M Y" }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{% url 'actualizar_usuario' usuario.pk %}" 
+                                       class="btn btn-outline-primary" title="Editar usuario">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% if user.is_superuser and usuario.id != user.id %}
+                                    <a href="{% url 'eliminar_usuario' usuario.pk %}" 
+                                       class="btn btn-outline-danger" title="Eliminar usuario">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Paginación -->
+    {% if is_paginated %}
+    <nav aria-label="Paginación de usuarios" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.rol %}&rol={{ request.GET.rol }}{% endif %}" title="Página anterior">
+                        &laquo; Anterior
+                    </a>
+                </li>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if request.GET.rol %}&rol={{ request.GET.rol }}{% endif %}" title="Página {{ num }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.rol %}&rol={{ request.GET.rol }}{% endif %}" title="Página siguiente">
+                        Siguiente &raquo;
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    
+{% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-users fa-4x text-muted mb-3"></i>
+        <h3 class="text-muted">No hay usuarios</h3>
+        <p class="text-muted">
+            No se encontraron usuarios con los filtros aplicados.
+        </p>
+        <a href="{% url 'crear_administrador' %}" class="btn btn-primary btn-lg" title="Crear primer usuario">
+            <i class="fas fa-user-plus"></i> Crear Primer Usuario
+        </a>
+    </div>
+{% endif %}
+{% endblock %}

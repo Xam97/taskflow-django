@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Iniciar Sesión - TaskFlow{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Error:</strong> Usuario o contraseña incorrectos. Por favor intenta de nuevo.
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">
+                            <strong>Usuario</strong>
+                        </label>
+                        <input type="text" name="username" class="form-control" id="id_username" required 
+                               placeholder="Ingresa tu usuario" autocomplete="username">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label">
+                            <strong>Contraseña</strong>
+                        </label>
+                        <input type="password" name="password" class="form-control" id="id_password" required 
+                               placeholder="Ingresa tu contraseña" autocomplete="current-password">
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                        </button>
+                    </div>
+                </form>
+                
+                <hr>
+                
+                <div class="text-center">
+                    <p class="mb-0">¿No tienes cuenta? 
+                        <a href="{% url 'registro' %}" class="text-decoration-none">Regístrate aquí</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

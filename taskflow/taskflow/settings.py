@@ -1,16 +1,20 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Cargar variables de entorno
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-tu-clave-secreta-aqui-cambiar-en-produccion'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-tu-clave-secreta-aqui-cambiar-en-produccion')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'False'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Application definition
 INSTALLED_APPS = [
@@ -20,11 +24,27 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',  # Django REST Framework
     # Nuestras apps
     'usuarios',
     'proyectos',
     'tareas',
 ]
+# Configuración REST Framework
+REST_FRAMEWORK = {
+    # Permitimos lectura pública (GET) y requerimos autenticación para
+    # operaciones que modifican datos (POST/PUT/PATCH/DELETE).
+    # Hacer la API pública (permitir todos los métodos sin autenticación).
+    # ADVERTENCIA: esto deja la API abierta; usar sólo en desarrollo o para pruebas.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+    # Usar Session + Basic auth para facilitar el testing desde el navegador
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -99,4 +119,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Login/Logout redirects (IMPORTANTE para autenticación)
 LOGIN_REDIRECT_URL = 'dashboard'
-LOGOUT_REDIRECT_URL = 'login'
+LOGOUT_REDIRECT_URL = 'home'
+LOGIN_URL = 'login'
+
+# Configurar modelo de usuario personalizado
+AUTH_USER_MODEL = 'usuarios.UsuarioPersonalizado'

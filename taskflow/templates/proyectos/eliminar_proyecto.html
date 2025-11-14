@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar {{ proyecto.nombre }} - TaskFlow{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación
+                </h4>
+            </div>
+            <div class="card-body text-center">
+                <div class="mb-4">
+                    <i class="fas fa-trash-alt fa-4x text-danger mb-3"></i>
+                    <h3>¿Estás seguro?</h3>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <strong>¡Atención!</strong> Estás a punto de eliminar el proyecto:
+                    <h5 class="mt-2">"{{ proyecto.nombre }}"</h5>
+                </div>
+                
+                <p class="text-muted">
+                    Esta acción <strong>no se puede deshacer</strong>. Se eliminarán todos los datos 
+                    asociados al proyecto, incluyendo tareas y comentarios.
+                </p>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="{% url 'proyectos:detalle_proyecto' proyecto.pk %}" class="btn btn-secondary me-md-2" title="Cancelar y volver al proyecto">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger" title="Eliminar proyecto permanentemente">
+                            <i class="fas fa-trash"></i> Sí, Eliminar Proyecto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

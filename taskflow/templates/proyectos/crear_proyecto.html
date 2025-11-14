@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear Proyecto - TaskFlow{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-plus-circle"></i> Crear Nuevo Proyecto
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Por favor corrige los siguientes errores:</strong>
+                            <ul class="mb-0">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.nombre.id_for_label }}" class="form-label">
+                            <strong>Nombre del Proyecto *</strong>
+                        </label>
+                        {{ form.nombre }}
+                        {% if form.nombre.help_text %}
+                            <div class="form-text">{{ form.nombre.help_text }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.descripcion.id_for_label }}" class="form-label">
+                            <strong>Descripción</strong>
+                        </label>
+                        {{ form.descripcion }}
+                        {% if form.descripcion.help_text %}
+                            <div class="form-text">{{ form.descripcion.help_text }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.fecha_vencimiento.id_for_label }}" class="form-label">
+                            <strong>Fecha de Vencimiento *</strong>
+                        </label>
+                        {{ form.fecha_vencimiento }}
+                        {% if form.fecha_vencimiento.help_text %}
+                            <div class="form-text">{{ form.fecha_vencimiento.help_text }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="{{ form.miembros.id_for_label }}" class="form-label">
+                            <strong>Miembros del Equipo</strong>
+                        </label>
+                        {{ form.miembros }}
+                        <div class="form-text">
+                            Selecciona los miembros que participarán en este proyecto (opcional).
+                            Puedes mantener presionada la tecla Ctrl para seleccionar múltiples miembros.
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'proyectos:lista_proyectos' %}" class="btn btn-secondary me-md-2" title="Cancelar y volver a la lista">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success" title="Crear proyecto">
+                            <i class="fas fa-check"></i> Crear Proyecto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
