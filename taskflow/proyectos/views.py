@@ -6,11 +6,13 @@ from django.db.models import Count, Q
 from .models import Proyecto
 from .forms import ProyectoForm
 
+
+# VISTA PARA CREAR PROYECTOS
 class CrearProyectoView(LoginRequiredMixin, CreateView):
     model = Proyecto
     form_class = ProyectoForm
     template_name = 'proyectos/crear_proyecto.html'
-    success_url = reverse_lazy('proyectos:lista_proyectos')
+    success_url = reverse_lazy('proyectos:lista_proyectos') # Redirección después de éxito
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -18,7 +20,7 @@ class CrearProyectoView(LoginRequiredMixin, CreateView):
         return kwargs
     
     def form_valid(self, form):
-        form.instance.creador = self.request.user
+        form.instance.creador = self.request.user # Asigna el usuario actual como creador
         response = super().form_valid(form)
         messages.success(self.request, '✅ Proyecto creado correctamente')
         return response
@@ -27,7 +29,8 @@ class ListaProyectosView(LoginRequiredMixin, ListView):
     model = Proyecto
     template_name = 'proyectos/lista_proyectos.html'
     context_object_name = 'proyectos'
-    paginate_by = 6
+    paginate_by = 6 # Divide resultados en páginas de 6 elementos
+
     
     def get_queryset(self):
         # Si es admin, ve TODOS los proyectos
