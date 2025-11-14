@@ -4,6 +4,8 @@ from usuarios.models import UsuarioPersonalizado
 from proyectos.models import Proyecto
 
 class Tarea(models.Model):
+
+    #Definicion de opciones pre establecidas
     ESTADOS = [
         ('pendiente', 'Pendiente'),
         ('en_progreso', 'En Progreso'),

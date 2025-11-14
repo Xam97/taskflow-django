@@ -5,6 +5,7 @@ from proyectos.models import Proyecto
 from .serializers import TareaSerializer
 
 class TareaViewSet(viewsets.ModelViewSet):
+    # Serializer que convierte entre modelos Python y JSON
     serializer_class = TareaSerializer
     # Permitir acceso público para pruebas (POST/PUT/DELETE) — usar sólo en dev
     permission_classes = [permissions.AllowAny]
