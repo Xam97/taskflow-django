@@ -192,7 +192,7 @@ Ver `requirements.txt` para lista completa.
 
 ## 📝 API REST
 
-La API REST está disponible en `/api/`. Ver documentación en `/api/docs/`.
+La API REST está disponible en `/api/`. 
 
 
 ## 📄 Licencia
